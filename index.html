@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Risk Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .input-group input:hover {
+            border-color: #4facfe;
+            background: white;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 43px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .predict-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .predict-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            padding: 30px;
+            margin-top: 30px;
+            border-radius: 12px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .info-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #4facfe;
+        }
+
+        .info-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-container {
+                padding: 25px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .loading.active {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-heartbeat"></i> Diabetes Risk Predictor</h1>
+            <p>Advanced AI-powered health assessment tool</p>
+        </div>
+
+        <div class="form-container">
+            <form action="{{ url_for('predict') }}" method="post" id="predictionForm">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="pregnancies">Number of Pregnancies</label>
+                        <input type="number" id="pregnancies" name="pregnancies" min="0" max="20" required>
+                        <i class="fas fa-baby input-icon"></i>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="glucose">Glucose Level (mg/dL)</label>
+                        <input type="number" id="glucose" name="glucose" min="0" max="300" step="1" required>
+                        <i class="fas fa-tint input-icon"></i>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="bloodpressure">Blood Pressure (mmHg)</label>
+                        <input type="number" id="bloodpressure" name="bloodpressure" min="0" max="200" step="1" required>
+                        <i class="fas fa-heart input-icon"></i>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="skinthickness">Skin Thickness (mm)</label>
+                        <input type="number" id="skinthickness" name="skinthickness" min="0" max="100" step="1" required>
+                        <i class="fas fa-ruler input-icon"></i>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="insulin">Insulin Level (μU/mL)</label>
+                        <input type="number" id="insulin" name="insulin" min="0" max="1000" step="1" required>
+                        <i class="fas fa-syringe input-icon"></i>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="bmi">Body Mass Index (kg/m²)</label>
+                        <input type="number" id="bmi" name="bmi" min="0" max="70" step="0.1" required>
+                        <i class="fas fa-weight input-icon"></i>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="dpf">Diabetes Pedigree Function</label>
+                        <input type="number" id="dpf" name="dpf" min="0" max="3" step="0.001" required>
+                        <i class="fas fa-dna input-icon"></i>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="age">Age (years)</label>
+                        <input type="number" id="age" name="age" min="1" max="120" required>
+                        <i class="fas fa-birthday-cake input-icon"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="predict-btn" id="submitBtn">
+                    <i class="fas fa-chart-line"></i>
+                    Analyze Risk
+                    <i class="fas fa-spinner loading" id="loadingSpinner"></i>
+                </button>
+            </form>
+
+            <div class="info-section">
+                <h3><i class="fas fa-info-circle"></i> Parameter Guidelines</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Glucose:</strong>
+                        Normal: 70-99 mg/dL<br>
+                        Prediabetes: 100-125 mg/dL<br>
+                        Diabetes: ≥126 mg/dL
+                    </div>
+                    <div class="info-item">
+                        <strong>Blood Pressure:</strong>
+                        Normal: <120/80 mmHg<br>
+                        High: ≥140/90 mmHg
+                    </div>
+                    <div class="info-item">
+                        <strong>BMI:</strong>
+                        Normal: 18.5-24.9<br>
+                        Overweight: 25-29.9<br>
+                        Obese: ≥30
+                    </div>
+                    <div class="info-item">
+                        <strong>Insulin:</strong>
+                        Normal fasting: 2.6-24.9 μU/mL<br>
+                        Higher levels may indicate resistance
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><i class="fas fa-shield-alt"></i> Secure • Confidential • AI-Powered Analysis</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            loadingSpinner.classList.add('active');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner loading active"></i> Analyzing...';
+        });
+
+        // Add input validation and formatting
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value < 0) this.value = 0;
+            });
+        });
+    </script>
+</body>
+</html>

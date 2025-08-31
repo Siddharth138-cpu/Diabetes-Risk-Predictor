@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Risk Analysis Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .result-container {
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+        }
+
+        .positive-result .result-card::before {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        }
+
+        .negative-result .result-card::before {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .positive-result .result-icon {
+            color: #ff6b6b;
+            animation: pulse 2s infinite;
+        }
+
+        .negative-result .result-icon {
+            color: #4ecdc4;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .result-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .positive-result .result-title {
+            color: #ff6b6b;
+        }
+
+        .negative-result .result-title {
+            color: #4ecdc4;
+        }
+
+        .result-message {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .result-image {
+            max-width: 200px;
+            height: auto;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .recommendations {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .recommendations h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recommendation-list {
+            list-style: none;
+        }
+
+        .recommendation-list li {
+            padding: 10px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .recommendation-list li i {
+            color: #4facfe;
+            margin-top: 3px;
+            font-size: 1.1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        .disclaimer p {
+            color: #856404;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .result-container {
+                padding: 30px 20px;
+            }
+
+            .result-card {
+                padding: 30px 20px;
+            }
+
+            .result-title {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Analysis Complete</h1>
+            <p>Your diabetes risk assessment results</p>
+        </div>
+
+        <div class="result-container">
+            {% if prediction == 1 %}
+            <div class="positive-result">
+                <div class="result-card">
+                    <i class="fas fa-exclamation-triangle result-icon"></i>
+                    <h2 class="result-title">Higher Risk Detected</h2>
+                    <p class="result-message">
+                        Based on your health parameters, our AI model indicates an elevated risk for diabetes.
+                        This is a predictive assessment and should be discussed with a healthcare professional.
+                    </p>
+                    <img src="{{ url_for('static', filename='diabetes.webp') }}" alt="Diabetes Risk" class="result-image">
+                </div>
+
+                <div class="recommendations">
+                    <h3><i class="fas fa-stethoscope"></i> Recommended Actions</h3>
+                    <ul class="recommendation-list">
+                        <li><i class="fas fa-user-md"></i> Consult with a healthcare provider immediately for proper medical evaluation</li>
+                        <li><i class="fas fa-vial"></i> Consider getting comprehensive blood work including HbA1c test</li>
+                        <li><i class="fas fa-apple-alt"></i> Adopt a balanced, low-glycemic diet with reduced sugar intake</li>
+                        <li><i class="fas fa-running"></i> Incorporate regular physical activity (150+ minutes per week)</li>
+                        <li><i class="fas fa-weight-scale"></i> Work towards achieving and maintaining a healthy weight</li>
+                        <li><i class="fas fa-calendar-check"></i> Schedule regular health monitoring and check-ups</li>
+                    </ul>
+                </div>
+            </div>
+            {% else %}
+            <div class="negative-result">
+                <div class="result-card">
+                    <i class="fas fa-check-circle result-icon"></i>
+                    <h2 class="result-title">Lower Risk Detected</h2>
+                    <p class="result-message">
+                        Great news! Based on your health parameters, our AI model indicates a lower risk for diabetes.
+                        Continue maintaining your healthy lifestyle habits.
+                    </p>
+                    <img src="{{ url_for('static', filename='no-diabetes.webp') }}" alt="Healthy Lifestyle" class="result-image">
+                </div>
+
+                <div class="recommendations">
+                    <h3><i class="fas fa-heart"></i> Maintain Your Health</h3>
+                    <ul class="recommendation-list">
+                        <li><i class="fas fa-apple-alt"></i> Continue eating a balanced, nutritious diet</li>
+                        <li><i class="fas fa-dumbbell"></i> Keep up with regular physical activity and exercise</li>
+                        <li><i class="fas fa-calendar-alt"></i> Schedule routine health check-ups annually</li>
+                        <li><i class="fas fa-tint"></i> Stay hydrated and limit sugary beverages</li>
+                        <li><i class="fas fa-moon"></i> Maintain good sleep hygiene (7-9 hours per night)</li>
+                        <li><i class="fas fa-smoking-ban"></i> Avoid smoking and limit alcohol consumption</li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="disclaimer">
+                <p>
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Medical Disclaimer:</strong> This assessment is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
+                </p>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ url_for('home') }}" class="btn btn-primary">
+                    <i class="fas fa-redo"></i> New Assessment
+                </a>
+                <button onclick="window.print()" class="btn btn-secondary">
+                    <i class="fas fa-print"></i> Print Results
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add smooth scroll and print functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate the result card on load
+            const resultCard = document.querySelector('.result-card');
+            resultCard.style.opacity = '0';
+            resultCard.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                resultCard.style.transition = 'all 0.6s ease';
+                resultCard.style.opacity = '1';
+                resultCard.style.transform = 'translateY(0)';
+            }, 300);
+        });
+    </script>
+</body>
+</html>
